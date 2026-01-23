@@ -11,4 +11,5 @@ def eletriityBill(units):
         bill = (100 * 5) + (100 * 7) + (100 * 10) + ((units - 300) * 15)
     return bill 
 units = int(input("Enter your UNITS: "))
-print(eletriityBill(units))
+total = (eletriityBill(units))
+print(f'Your total bill is {total}/- for {units} units')
