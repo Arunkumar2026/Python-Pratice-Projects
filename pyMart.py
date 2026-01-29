@@ -19,9 +19,49 @@ cart = {} #This is the cart which products are added to it.
 
 #This function will show the products
 def show_products():
-    pass
+    print("----- Available Products -----")
+    for pid, details in products.items(): #Iterating through each product using fop loop
+        print(f'{pid}. {details["name"]} - {details["price"]}') #This is the formatted string
+
+#This is the add to cart function
+def add_to_cart():
+    show_products() #Calling the show products function
+    try: #using try method 
+        pid = int(input("Enter product ID to add: "))
+        if pid in products:
+            qty = int(input("Enter quantity: "))
+            if pid in cart:
+                cart[pid]['quantity'] += qty 
+            else:
+                cart[pid] = {
+                    'name': products[pid]['name'],
+                    'price': products[pid]['price'],
+                    'quantity': qty 
+                }
+            print(f'{qty} x {products[pid]["name"]} added into cart.')
+        else:
+            print('Invaid Product ID')
+    except ValueError:
+        print("Invalid Input")
 
 
+
+
+#This is the view cart function
+def view_cart():
+    print('----- Your Cart -----')
+    if not cart: #This is the membership operator if the cart is empty this will be True
+        print('Cart is Empty')
+    else: #If the cart has products then the else block will be execute
+        total = 0
+        for pid, item in cart.items(): #This for loop will be iterate through the cart
+            name = item['name']
+            price = item['price']
+            qty = item['quantity']
+            sub_total = qty * price 
+            total = total + sub_total
+            print(f'{name} x {qty} = {sub_total}/-')
+        print(f'Total: {total}/-')
 
 #This is the menu which shows the products to the customers.
 def menu(): 
@@ -54,4 +94,4 @@ def menu():
         else: #If any of the conditions are not True then the else block will be exicute
             print("Invaild choice! Please try again.")
 
-
+menu()
