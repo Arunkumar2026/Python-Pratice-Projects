@@ -49,6 +49,116 @@ def register_user(users):
     print(f'user: {name} registered successfully.\n')
     return users
 
+#this view users function will show the number of users in the database
+def view_users(users):
+    #first we have to check if the user data is empty or not for this we use if condition
+    if not users: #not is the membership operatior
+        print('No registered users\n') #if the conditon is true then this print will execute the message
+        return 
+    #below code will execute if the users file is not empty
+    print('----- Registered Users ------')
+    #we have to use for loop to extract the data from the users file
+    for idx,user in enumerate(users,start=1):
+        borrowed_title = [b['title'] for b in user['borrowed_books']]
+        print(f'{idx}. {user["name"]} - Borrowed Books: {borrowed_title}')
+    print()
+
+#this function will add books to the library
+def add_book(books):
+    #this is title variable will take the title of the book from the user
+    title = input("Enter book title: ")
+    #this author variable will take the author of the book 
+    author = input("Enter author name: ")
+
+    #this try block will ask they user that how many book does he want to add to the library
+    try:
+        quantity =  int(input("Enter quantity of books: "))
+    #if the valueError is raised then the except block will handle that error 
+    except ValueError:
+        print("invalid quantity. setting quantity = 1")
+        quantity = 1
+    #the details which we have taken we have to append it to books variable
+    books.append({
+        "title":title,
+        "author":author,
+        'quantity':quantity
+    })
+    #the appended details should be saved for that we have to call the save_json function
+    save_json(BOOK_FILE,books)
+    #showing the succes message
+    print(f'Book: {title} by {author} added with quantity {quantity}\n')
+
+#this function will show the library books
+def view_books(books):
+    #first we have to check if there is any book is there or not with if conditon
+    if not books:
+        print("No books in the library\n")
+        return
+    #if books are there then this will be execute
+    print("----- Library Books ------")
+    #to view the books we have to use the for loop
+    for idx,book in enumerate(books,start=1):
+        print(f'{idx}. {book["title"]} by {book["author"]} [Quantity:{book["quantity"]}]')
+    print()
+
+#this function will find if the user is present in the user data or not
+def find_user(users,name):
+    #we have to loop through the each item in the user for this we have to use for loop
+    for user in users:
+        #each given name should be check with the user data with if conditon
+        if user["name"] == name:
+            #if the given name is present in the user data then the user will be return 
+            return user
+    #if the given name is not matched with user data then the None will be return
+    return 
+
+
+
+#this fucntion will the users to borrow books eachother
+def borrow_book(books, users):
+    #first we have to check if he user is exist or not for that we have to use if condition
+    if not users:
+        print("No users registered.\n")
+        return books, users
+    #if the have user date then the below code will be execute
+    #then we have to take the user name
+    user_name = input("Enter your name: ")
+    #we have to check if the given name is present in the user data or not
+    user = find_user(users,user_name)
+    #we have to check if the user is present or not
+    if not user:
+        print("User not found.\n")
+        #we have to return the books and users
+        return books, users 
+    #we have to call the view books function to show the books to the user
+    view_books(books)
+    #next we have to check the if the book are present or not
+    if not books:
+        return books, users
+    try:
+        choice = int(input("Enter book number: ")) - 1
+        if 0 <= choice < len(books):
+            if books[choice]['quantity'] > 0:
+                books[choice]['quantity'] -= 1
+
+
+                user['borrowed_books'].append({
+                    "title":books[choice]['title'],
+                    "author":books[choice]['author']
+                })
+
+                save_json(BOOK_FILE,books)
+                save_json(USER_FILE,users)
+
+                print(f'You borrowed {books[choice]["title"]} successfully')
+            else:
+                print("Sorry, out of stock")
+
+        else:
+            print("Invalid book number")
+    except ValueError:
+        print("Please enter valid number")
+    return books, users
 
 #this is the main function
 def main():
@@ -75,13 +185,13 @@ def main():
         if choice == "1":
             users = register_user(users)
         elif choice == "2":
-            view_users(users)
+            users = view_users(users)
         elif choice == "3":
-            add_book(books)
+            books = add_book(books)
         elif choice == "4":
-            view_books(books)
+            books = view_books(books)
         elif choice == "5":
-            borrow_book(books, users)
+            books, users = borrow_book(books, users)
         elif choice == "6":
             return_book(books, users)
         elif choice == "7":
